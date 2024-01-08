@@ -116,6 +116,7 @@ body, html {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.35s ease;
 }
 
 .header .search button:hover {
@@ -168,10 +169,44 @@ body, html {
 .diagnosisMedicationForm {
     background-color: white;
     padding: 20px;
-    margin-top: 20px;
+    margin: 20px auto;
+    width: 50%; /* Или другой подходящий размер */
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    display: flex; /* Для горизонтального выравнивания элементов */
-    align-items: center; /* Центрирование элементов по вертикали */
-    justify-content: space-between; /* Распределение элементов с пространством между ними */
+    text-align: center;
 }
+
+.diagnosisMedicationForm label {
+    display: block;
+    margin: 10px 0 5px;
+    color: #333;
+    font-size: 16px;
+}
+
+.diagnosisMedicationForm input[type="text"] {
+    padding: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 80%; /* Или другой подходящий размер */
+}
+
+.diagnosisMedicationForm button {
+    background-color: #506EA9;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.35s ease;
+}
+
+.diagnosisMedicationForm button:hover {
+    background-color: #394A6D;
+}
+
+#saveButton, #cancelDiagnosisButton {
+    width: 45%; /* Размеры кнопок */
+}
+

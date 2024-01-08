@@ -99,3 +99,9 @@ try:
 except Exception as e:
     print("Произошла ошибка:", e)
 
+
+@eel.expose
+def add_patient(full_name, birth_date):
+    c.execute('INSERT INTO patients (full_name, birth_date) VALUES (?, ?)', (full_name, birth_date))
+    conn.commit()
+    return c.lastrowid

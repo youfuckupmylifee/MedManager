@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация пациента</title>
+    <link rel="stylesheet" href="css/registry.css">
+    <script src="eel.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="img/logo.svg" alt="Логотип">
+            </div>
+            <nav class="menu">
+                <a href="patient.html" class="menu-item patient">
+                    <img src="img/client.svg" alt="Пациент">
+                    <span>Пациент</span>
+                </a>
+                <a href="doctor.html" class="menu-item doctor">
+                    <img src="img/doctor.svg" alt="Доктор">
+                    <span>Врач</span>
+                </a>
+                <a href="registry.html" class="menu-item registry">
+                    <img src="img/registry.svg" alt="Регистратура">
+                    <span>Регистратура</span>
+                </a>
+				<a href="#" onclick="loadMainPage()" class="menu-item home">
+					<img src="img/home.svg" alt="Главное меню">
+					<span>Главное меню</span>
+				</a>
+            </nav>
+        </aside>
+
+        <div class="registry-form">
+            <form class="patient-registration-form" id="patient-registration-form">
+                <h1>Регистрация пациента</h1>
+                <input type="text" id="full_name" placeholder="ФИО" required><br>
+                <input type="date" id="birth_date" required><br>
+                <button type="submit">Зарегистрировать</button>
+            </form>
+            <div id="registration-result" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('patient-registration-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                let full_name = document.getElementById('full_name').value;
+                let birth_date = document.getElementById('birth_date').value;
+                
+                eel.add_patient(full_name, birth_date)(function(response) {
+                    document.getElementById('registration-result').innerHTML = `
+                        <p>ФИО: ${full_name}</p>
+                        <p>Дата рождения: ${birth_date}</p>
+                        <p>№ полиса: ${response}</p>
+                    `;
+                });
+            });
+        });
+    </script>
+
+    <!-- Для перехода на главную страницу -->
+    <script>
+        function loadMainPage() {
+            fetch('main.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.body.innerHTML = data;
+                    // Выполнить дополнительные действия после загрузки, если нужно
+                });
+        }
+    </script>
+
+</body>
+</html>

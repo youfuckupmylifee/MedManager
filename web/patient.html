@@ -114,17 +114,25 @@
                 e.preventDefault();  
                 
                 var policyNumber = document.getElementById('policyNumber').value;
+                var complaintsAssertions = {
+                    "q1": "Пациент болен уже давно",
+                    "q2": "Пациент принимал какие-то препараты",
+                    "q3": "У пациента есть хронические заболевания",
+                    "q4": "У пациента были перенесенные заболевания",
+                    "q5": "У пациента были переливания крови",
+                    "q6": "У пациента были операционные вмешательства",
+                    "q7": "У пациента есть боль в горле",
+                    "q8": "У пациента есть боли в области живота"
+                };
                 var complaints = [];
-                // Собираем жалобы в массив
                 document.querySelectorAll('.question').forEach(questionDiv => {
                     let activeButton = questionDiv.querySelector('button.active');
                     if (activeButton && activeButton.textContent === 'ДА') {
-                        let complaintText = questionDiv.querySelector('label').textContent;
-                        complaints.push(complaintText); // Теперь complaints — это массив
+                        let complaintKey = questionDiv.querySelector('button').id.split('-')[0]; // 'q1', 'q2', etc.
+                        complaints.push(complaintsAssertions[complaintKey]);
                     }
                 });
                 
-                // Теперь передаем массив жалоб в Python
                 eel.update_complaints(policyNumber, complaints)(function(response) {
                     alert(response);
                 });

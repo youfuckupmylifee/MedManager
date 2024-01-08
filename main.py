@@ -30,21 +30,26 @@ def update_complaints(policy_number, complaints_list):
     # Преобразуем список жалоб в строку, разделяя жалобы символом ';'
     complaints_str = ';'.join(complaints_list)
     
-    # Преобразуем policy_number в строку
-    policy_number_str = str(policy_number)
-    
+    # Преобразуем policy_number в число
+    try:
+        policy_number_int = int(policy_number)
+    except ValueError:
+        return "Неверный формат номера полиса"
+
     # Проверяем, существует ли пациент
-    c.execute('SELECT * FROM patients WHERE id=?', (policy_number_str,))
+    c.execute('SELECT * FROM patients WHERE id=?', (policy_number_int,))
     patient = c.fetchone()
     
     if patient:
         # Если пациент существует, обновляем его жалобы и присваиваем талон
         ticket_number = generate_ticket_number()
-        c.execute('UPDATE patients SET complaints=?, ticket_number=? WHERE id=?', (complaints_str, ticket_number, policy_number_str))
+        c.execute('UPDATE patients SET complaints=?, ticket_number=? WHERE id=?', (complaints_str, ticket_number, policy_number_int))
         conn.commit()
         return "Жалобы обновлены, номер талона: {}".format(ticket_number)
     else:
         return "Пациент с таким номером полиса не найден"
+
+
 
 
 def generate_ticket_number():

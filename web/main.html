@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="img/logo.svg" alt="Логотип">
+            </div>
+            <nav class="menu">
+                <a href="patient.html" class="menu-item patient">
+                    <img src="img/client.svg" alt="Пациент">
+                    <span>Пациент</span>
+                </a>
+                <a href="doctor.html" class="menu-item doctor">
+                    <img src="img/doctor.svg" alt="Доктор">
+                    <span>Врач</span>
+                </a>
+                <a href="#" class="menu-item registry">
+                    <img src="img/registry.svg" alt="Регистратура">
+                    <span>Регистратура</span>
+                </a>
+                <a href="main.html" class="menu-item home">
+                    <img src="img/home.svg" alt="Главное меню">
+                    <span>Главное меню</span>
+                </a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <h1>Выберите роль для входа</h1>
+        </main>
+    </div>
+
+    <script>
+        function loadMainPage() {
+            fetch('main.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.body.innerHTML = data;
+                    // Выполнить дополнительные действия после загрузки, если нужно
+                });
+        }
+        </script>
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+/* main.css */
+
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #F0F0F0; /* Or any other light color from the screenshot */
+}
+
+.container {
+    display: flex;
+    height: 100vh; /* Full height of the viewport */
+}
+
+.sidebar {
+    background-color: #394A6D; /* Adjust to match the color from the screenshot */
+    padding: 20px;
+    width: 250px; /* Adjust based on your preference */
+    box-sizing: border-box;
+}
+
+.logo img {
+    width: 60%;
+    margin-bottom: 30px;
+    margin-left: 40px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.menu-item img {
+    margin-right: 10px;
+}
+
+.menu-item span {
+    font-size: 18px; /* Adjust as needed */
+}
+
+.menu-item.patient {
+    background-color: #394A6D; /* Lighter shade for the patient link */
+}
+
+.menu-item.doctor {
+    background-color: #394A6D; /* Same as sidebar for the doctor link */
+}
+
+.menu-item.registry {
+    background-color: #394A6D; /* Same as sidebar for the doctor link */
+}
+
+.menu-item.home {
+    background-color: #506EA9; /* Same as sidebar for the doctor link */
+}
+
+.menu-item.patient:hover, .menu-item.doctor:hover, .menu-item.registry:hover, .menu-item.home:hover {
+    background-color: #506EA9; /* Изменение фона при наведении */
+}
+
+.home {
+    margin-top: 500px;
+}
+
+.main-content {
+    flex-grow: 1;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.main-content h1 {
+    color: #394A6D; /* Match the sidebar color or as per the screenshot */
+    font-size: 32px; /* Adjust as needed */
+}

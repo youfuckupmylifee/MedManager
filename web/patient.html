@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пациент</title>
+    <link rel="stylesheet" href="css/patient.css">
+    <script src="eel.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="img/logo.svg" alt="Логотип">
+            </div>
+            <nav class="menu">
+                <a href="patient.html" class="menu-item patient">
+                    <img src="img/client.svg" alt="Пациент">
+                    <span>Пациент</span>
+                </a>
+                <a href="doctor.html" class="menu-item doctor">
+                    <img src="img/doctor.svg" alt="Доктор">
+                    <span>Врач</span>
+                </a>
+                <a href="#" class="menu-item registry">
+                    <img src="img/registry.svg" alt="Регистратура">
+                    <span>Регистратура</span>
+                </a>
+                <a href="#" onclick="loadMainPage()" class="menu-item home">
+                    <img src="img/home.svg" alt="Главное меню">
+                    <span>Главное меню</span>
+                </a>
+                
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="header">
+                <form class="sidebar-patient-form">
+                    <h1>Пациент</h1>
+                    <div class="sidebar-input-group">
+                        <label class="policyNumber" for="policyNumber">№ полиса</label>
+                        <input type="text" id="policyNumber" name="policyNumber" placeholder="Введите № полиса">
+                    </div>
+                </form>
+            </div>
+			<form id="medical-form">
+				<div class="question">
+					<label for="q1">Давно ли началось заболевание?</label>
+					<button type="button" id="q1-yes">ДА</button>
+					<button type="button" id="q1-no">НЕТ</button>
+				</div>
+				<div class="question">
+					<label for="q2">Принимали ли какие-то препараты?</label>
+					<button type="button" id="q2-yes">ДА</button>
+					<button type="button" id="q2-no">НЕТ</button>
+				</div>
+				<div class="question">
+					<label for="q3">Хронические заболевания в анамнезе?</label>
+					<button type="button" id="q3-yes">ДА</button>
+					<button type="button" id="q3-no">НЕТ</button>
+				</div>
+				<div class="question">
+					<label for="q4">Перенесенные заболевания в анамнезе?</label>
+					<button type="button" id="q4-yes">ДА</button>
+					<button type="button" id="q4-no">НЕТ</button>
+				</div>
+				<div class="question">
+					<label for="q5">Были ли переливания крови?</label>
+					<button type="button" id="q5-yes">ДА</button>
+					<button type="button" id="q5-no">НЕТ</button>
+				</div>
+				<div class="question">
+					<label for="q6">Были ли операционные вмешательства?</label>
+					<button type="button" id="q6-yes">ДА</button>
+					<button type="button" id="q6-no">НЕТ</button>
+				</div>
+				<div class="question">
+					<label for="q7">Имеется ли боль в горле?</label>
+					<button type="button" id="q7-yes">ДА</button>
+					<button type="button" id="q7-no">НЕТ</button>
+				</div>
+				<div class="question">
+					<label for="q8">Присутствуют ли боли в области живота?</label>
+					<button type="button" id="q8-yes">ДА</button>
+					<button type="button" id="q8-no">НЕТ</button>
+				</div>
+
+                <button class="submit" type="submit">Отправить</button>
+			</form>
+			
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            function toggleActive(e) {
+                let questionDiv = e.target.parentElement;
+                let buttons = questionDiv.querySelectorAll('button');
+                
+                buttons.forEach(button => {
+                    button.classList.remove('active');
+                });
+                
+                e.target.classList.add('active');
+            }
+            
+            let allButtons = document.querySelectorAll('.question button');
+            allButtons.forEach(button => {
+                button.addEventListener('click', toggleActive);
+            });
+        
+            document.getElementById('medical-form').addEventListener('submit', function(e) {
+                e.preventDefault();  
+                
+                var policyNumber = document.getElementById('policyNumber').value;
+                var complaints = [];
+                // Собираем жалобы в массив
+                document.querySelectorAll('.question').forEach(questionDiv => {
+                    let activeButton = questionDiv.querySelector('button.active');
+                    if (activeButton && activeButton.textContent === 'ДА') {
+                        let complaintText = questionDiv.querySelector('label').textContent;
+                        complaints.push(complaintText); // Теперь complaints — это массив
+                    }
+                });
+                
+                // Теперь передаем массив жалоб в Python
+                eel.update_complaints(policyNumber, complaints)(function(response) {
+                    alert(response);
+                });
+            });
+        
+            document.getElementById('searchButton').addEventListener('click', function() {
+                var searchQuery = document.getElementById('searchPolicyNumber').value;
+                eel.search_patient(searchQuery)(function(result) {
+                    if (result !== "Не найдено") {
+                        // Убедитесь, что данные возвращаются в ожидаемом формате
+                        console.log(result); // Для отладки, проверьте, что данные приходят корректно
+                        var formattedComplaints = result.complaints.split(';').map(function(complaint) {
+                            return '- ' + complaint;
+                        }).join('<br>');
+
+                        var infoHtml = `
+                            <h2>Информация о пациенте:</h2>
+                            <p><strong>ФИО:</strong> ${result.full_name}</p>
+                            <p><strong>Дата рождения:</strong> ${result.birth_date}</p>
+                            <p><strong>Жалобы:</strong> <br>${formattedComplaints}</p>
+                            <p><strong>Номер талона:</strong> ${result.ticket_number}</p>
+                        `;
+                        document.getElementById('patientInfo').innerHTML = infoHtml;
+                        document.getElementById('patientInfo').style.display = 'block';
+                    } else {
+                        document.getElementById('patientInfo').innerHTML = '<p>Пациент не найден.</p>';
+                        document.getElementById('patientInfo').style.display = 'block';
+                    }
+                });
+            });
+        
+            document.getElementById('cancelButton').addEventListener('click', function() {
+                document.getElementById('searchPolicyNumber').value = '';
+                document.getElementById('patientInfo').style.display = 'none';
+            });
+        });
+        </script>
+        
+        <!-- Для перехода на главную страницу -->
+        <script>
+            function loadMainPage() {
+                fetch('main.html')
+                    .then(response => response.text())
+                    .then(data => {
+                        document.body.innerHTML = data;
+                        // Выполнить дополнительные действия после загрузки, если нужно
+                    });
+            }
+        </script>
+</body>
+</html>

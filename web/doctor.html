@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Врач</title>
+    <link rel="stylesheet" href="css/doctor.css">
+    <script src="eel.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="img/logo.svg" alt="Логотип">
+            </div>
+            <nav class="menu">
+                <a href="patient.html" class="menu-item patient">
+                    <img src="img/client.svg" alt="Пациент">
+                    <span>Пациент</span>
+                </a>
+                <a href="doctor.html" class="menu-item doctor active">
+                    <img src="img/doctor.svg" alt="Доктор">
+                    <span>Врач</span>
+                </a>
+                <a href="#" class="menu-item registry">
+                    <img src="img/registry.svg" alt="Регистратура">
+                    <span>Регистратура</span>
+                </a>
+				<a href="#" onclick="loadMainPage()" class="menu-item home">
+					<img src="img/home.svg" alt="Главное меню">
+					<span>Главное меню</span>
+				</a>
+				
+            </nav>
+        </aside>
+        <main class="main-content">
+
+            <div class="header">
+                <h1>Врач</h1>
+                <div class="search">
+                    <input type="text" id="searchPolicyNumber" name="searchPolicyNumber" placeholder="Введите ФИО или № талона">
+                    <button type="button" id="searchButton">Найти</button>
+                    <button type="button" id="cancelButton">Отмена</button>
+                </div>
+            </div>
+
+            <div class="patient-info" id="patientInfo" style="display: none;">
+
+            </div>
+
+			<div class="diagnosisMedicationForm" id="diagnosisMedicationForm" style="display: none;">
+				<form id="diagnosisForm">
+					<label for="diagnosisInput">Диагноз:</label>
+					<input type="text" id="diagnosisInput" name="diagnosis">
+					
+					<label for="medicationInput">Лекарственные препараты:</label>
+					<input type="text" id="medicationInput" name="medication">
+					
+					<button type="button" id="saveButton">Сохранить</button>
+					<button type="button" id="cancelDiagnosisButton">Отмена</button>
+				</form>
+			</div>
+
+        </main>
+    </div>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', (event) => {
+			var currentPatientId = null; // Будем хранить ID текущего пациента
+		
+			document.getElementById('searchButton').addEventListener('click', function() {
+				var searchQuery = document.getElementById('searchPolicyNumber').value;
+				eel.search_patient(searchQuery)(function(result) {
+					if (result !== "Не найдено") {
+						currentPatientId = result.id; // Сохраняем ID пациента
+						var formattedComplaints = result.complaints.join('<br>');
+		
+						var infoHtml = `
+							<h2>Информация о пациенте:</h2>
+							<p><strong>ФИО:</strong> ${result.full_name}</p>
+							<p><strong>Дата рождения:</strong> ${result.birth_date}</p>
+							<p><strong>Номер талона:</strong> ${result.ticket_number}</p>
+						`;
+						document.getElementById('patientInfo').innerHTML = infoHtml;
+						document.getElementById('patientInfo').style.display = 'block';
+		
+						// Создаем и отображаем ссылку на жалобы
+						createComplaintsLink(formattedComplaints);
+		
+						// Отображаем форму для ввода диагноза и лекарств
+						document.getElementById('diagnosisMedicationForm').style.display = 'block';
+					} else {
+						document.getElementById('patientInfo').innerHTML = '<p>Пациент не найден.</p>';
+						document.getElementById('patientInfo').style.display = 'block';
+						document.getElementById('diagnosisMedicationForm').style.display = 'none';
+					}
+				});
+			});
+		
+			document.getElementById('saveButton').addEventListener('click', function() {
+				var diagnosis = document.getElementById('diagnosisInput').value;
+				var medication = document.getElementById('medicationInput').value;
+		
+				// Вызов функций Python для сохранения диагноза и лекарств
+				eel.add_diagnosis(currentPatientId, diagnosis, new Date().toISOString().slice(0, 10))(function(response) {
+					console.log(response); // Обработка ответа от Python
+				});
+				eel.add_medication(currentPatientId, medication, 'Дозировка не указана', new Date().toISOString().slice(0, 10), 'Дата окончания не указана')(function(response) {
+					console.log(response); // Обработка ответа от Python
+				});
+		
+				// Очистка формы и скрытие ее
+				document.getElementById('diagnosisInput').value = '';
+				document.getElementById('medicationInput').value = '';
+				document.getElementById('diagnosisMedicationForm').style.display = 'none';
+			});
+		
+			document.getElementById('cancelDiagnosisButton').addEventListener('click', function() {
+				document.getElementById('diagnosisInput').value = '';
+				document.getElementById('medicationInput').value = '';
+				document.getElementById('diagnosisMedicationForm').style.display = 'none';
+			});
+		
+			function createComplaintsLink(formattedComplaints) {
+				var complaintsLink = document.getElementById('complaintsLink');
+				if (!complaintsLink) {
+					complaintsLink = document.createElement('p');
+					complaintsLink.id = 'complaintsLink';
+					complaintsLink.innerHTML = 'Жалобы: нажмите, чтобы посмотреть жалобы';
+					complaintsLink.style.cursor = 'pointer';
+					complaintsLink.style.color = 'blue';
+					complaintsLink.style.textDecoration = 'underline';
+					document.getElementById('patientInfo').appendChild(complaintsLink);
+		
+					var modal = document.getElementById('complaintsModal');
+					if (!modal) {
+						modal = document.createElement('div');
+						modal.id = 'complaintsModal';
+						modal.className = 'modal';
+						modal.style.display = 'none';
+						modal.innerHTML = `
+							<div class="modal-content">
+								<span class="close">&times;</span>
+								<p id="complaintsText">${formattedComplaints}</p>
+							</div>
+						`;
+						document.body.appendChild(modal);
+		
+						// Обработчик для закрытия модального окна
+						modal.querySelector('.close').onclick = function() {
+							modal.style.display = "none";
+						};
+						window.onclick = function(event) {
+							if (event.target == modal) {
+								modal.style.display = "none";
+							}
+						};
+					}
+				}
+				
+				complaintsLink.onclick = function() {
+					modal.style.display = "block";
+				};
+			}
+		
+			document.getElementById('cancelButton').addEventListener('click', function() {
+				document.getElementById('searchPolicyNumber').value = '';
+				document.getElementById('patientInfo').style.display = 'none';
+				var modal = document.getElementById('complaintsModal');
+				if (modal) {
+					modal.style.display = 'none';
+				}
+				var complaintsLink = document.getElementById('complaintsLink');
+				if (complaintsLink) {
+					complaintsLink.style.display = 'none';
+				}
+				var diagnosisForm = document.getElementById('diagnosisMedicationForm');
+				if (diagnosisForm) {
+					diagnosisForm.style.display = 'none';
+				}
+			});
+		});
+		</script>
+
+		<!-- Для перехода на главную страницу -->
+		<script>
+			function loadMainPage() {
+				fetch('main.html')
+					.then(response => response.text())
+					.then(data => {
+						document.body.innerHTML = data;
+						// Выполнить дополнительные действия после загрузки, если нужно
+					});
+			}
+		</script>		
+		
+</body>
+</html>
